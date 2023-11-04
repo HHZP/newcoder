@@ -10,7 +10,7 @@ public class User {
     private int id;
     private String username;
     private String password;
-    private String salt;
+    private String salt; //随机字符串，用于给密码加密
     private String email;
     private int type;
     private int status;
