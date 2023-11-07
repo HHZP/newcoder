@@ -43,4 +43,5 @@ logging:
 community:
     path:
         domain: http://localhost:8088
+        upload: d:/work/data/upload
 
