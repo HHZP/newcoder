@@ -1,6 +1,7 @@
 package com.example.newcoder;
 
 import com.example.newcoder.controller.HelloController;
+import com.example.newcoder.util.SensitiveFilter;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +15,14 @@ class NewcoderApplicationTests {
 
     @Autowired
     private int a;
+
+    @Autowired
+    SensitiveFilter sensitiveFilter;
     @Test
     void contextLoads() {
-        System.out.println(a);
+        String text = "赌博|||||111，嫖娼，开票";
+        text = sensitiveFilter.filter(text);
+        System.out.println(text);
     }
 
 }
