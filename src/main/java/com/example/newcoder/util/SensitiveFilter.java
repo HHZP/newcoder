@@ -79,9 +79,10 @@ public class SensitiveFilter {
         while (begin < text.length()) {
 
             if(position >= text.length()){
+                sb.append(text.charAt(begin));
                 position = ++begin;
                 tempNode = rootNode;
-                sb.append(text.charAt(begin));
+                continue;
             }
             char c = text.charAt(position);
 
@@ -97,9 +98,9 @@ public class SensitiveFilter {
 
             tempNode = tempNode.getSubNode(c);
             if(tempNode == null) {
+                sb.append(text.charAt(begin));
                 position = ++begin;
                 tempNode = rootNode;
-                sb.append(text.charAt(begin));
             } else if(tempNode.isKeywordEnd()){
                 sb.append(REPLACEMENT);
                 tempNode= rootNode;
