@@ -26,7 +26,7 @@ public class ExceptionAdvice {
         }
 
         String xRequestedWith = request.getHeader("x-requested-with");
-        if ("XMLHttpRequest".equals(xRequestedWith)) {
+        if ("XMLHttpRequest".equals(xRequestedWith)) {//判断是不是Ajax请求,即判断是否是异步
             response.setContentType("application/plain;charset=utf-8");
             PrintWriter writer = response.getWriter();
             writer.write(CommunityUtil.getJSONString(1,"服务器异常!"));

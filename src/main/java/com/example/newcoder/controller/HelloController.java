@@ -4,7 +4,9 @@ import com.example.newcoder.entity.DiscussPost;
 import com.example.newcoder.entity.Page;
 import com.example.newcoder.entity.User;
 import com.example.newcoder.service.DiscussPostService;
+import com.example.newcoder.service.LikeService;
 import com.example.newcoder.service.UserService;
+import com.example.newcoder.util.CommunityConstant;
 import com.example.newcoder.util.CommunityUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
-public class HelloController {
+public class HelloController implements CommunityConstant {
     @Autowired
     private DiscussPostService discussPostService;
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private LikeService likeService;
 
     @GetMapping("/index")
     public String getIndexPage(Model model,Page page) {
@@ -41,6 +46,10 @@ public class HelloController {
                 map.put("post",post);
                 User user = userService.findUserById(post.getUserId());
                 map.put("user",user);
+
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST,post.getId());
+                map.put("likeCount",likeCount);
+
                 discussPosts.add(map);
             }
         }

@@ -18,12 +18,12 @@ import java.util.Date;
 
 @Component
 @Aspect
-public class ServiceLogAspect {
+public class ServiceLogAspect { //面向切片编程
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceLogAspect.class);
 
     //切点
-    @Pointcut("execution(* com.example.newcoder.service.*.*(..))") //service下的 所有包-> 所有组件 ->所有变量
+    @Pointcut("execution(* com.example.newcoder.service.*.*(..))") //service下的 所有组件 ->所有变量
     public void pointcut() {
     }
 
@@ -31,6 +31,9 @@ public class ServiceLogAspect {
     public void before(JoinPoint joinPoint) {
         // 用户[1.2.3.4],在[xxx],访问了[com.nowcoder.community.service.xxx()]. 格式
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            return;
+        }
         HttpServletRequest request = attributes.getRequest();
         String ip = request.getRemoteHost();
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
