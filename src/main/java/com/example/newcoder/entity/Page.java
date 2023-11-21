@@ -56,7 +56,7 @@ public class Page {
 
     //获取总页数
     public int getTotal() {
-        return (rows+limit-1)%limit;
+        return (rows+limit-1)/limit;
     }
 
     //获得其实页码，就是下面的页码条

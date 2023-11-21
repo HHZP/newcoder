@@ -39,6 +39,12 @@ spring:
             enable-auto-commit: true
             auto-commit-interval: 3000
 
+    elasticsearch:
+        uris: localhost:9200
+        socket-timeout: 30s
+        connection-timeout: 5s
+
+
 mybatis:
     mapper-locations: classpath:mapper/*.xml
     type-aliases-package: com.example.newcoder.entity

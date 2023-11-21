@@ -1,18 +1,18 @@
 package com.example.newcoder.event;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.newcoder.entity.DiscussPost;
 import com.example.newcoder.entity.Event;
 import com.example.newcoder.entity.Message;
+import com.example.newcoder.service.DiscussPostService;
 import com.example.newcoder.service.MessageService;
 import com.example.newcoder.util.CommunityConstant;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.thymeleaf.context.IContext;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +25,10 @@ public class EventConsumer implements CommunityConstant {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private DiscussPostService discussPostService;
+
 
     @KafkaListener(topics = {TOPIC_COMMENT, TOPIC_LIKE, TOPIC_FOLLOW})
     public void handleCommentMessage(ConsumerRecord record) {
@@ -51,7 +55,7 @@ public class EventConsumer implements CommunityConstant {
         content.put("entityType",event.getEntityType());
         content.put("entityId",event.getEntityId());
 
-        if(event.getData().isEmpty()) {
+        if(!event.getData().isEmpty()) {
             for(Map.Entry<String,Object> entry : event.getData().entrySet()) {
                 content.put(entry.getKey(),entry.getValue());
             }
@@ -59,5 +63,23 @@ public class EventConsumer implements CommunityConstant {
 
         message.setContent(JSONObject.toJSONString(content));
         messageService.addMessage(message);
+    }
+
+    // 消费发帖事件
+
+    @KafkaListener(topics = {TOPIC_PUBLISH})
+    public void handlePublishMessage(ConsumerRecord record) {
+        if (record == null || record.value() == null) {
+            logger.error("消息的内容为空!");
+            return ;
+        }
+
+        Event event = JSONObject.parseObject(record.value().toString(),Event.class);
+        if (event == null) {
+            logger.error("消息格式错误");
+            return ;
+        }
+
+        DiscussPost post = discussPostService.findDiscussPostById(event.getEntityId());
     }
 }

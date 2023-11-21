@@ -13,14 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -117,7 +115,7 @@ public class UserService implements CommunityConstant {
             return ACTIVATION_REPEAT;
         }  else if (user.getActivationCode().equals(code)) {
             userMapper.updateStatus(userId,1);
-            initCache(userId);
+            clearCache(userId);
             return ACTIVATION_SUCCESS;
         }  else {
             return ACTIVATION_FAILURE;
@@ -184,7 +182,7 @@ public class UserService implements CommunityConstant {
 
     public int updateHeader(int userId, String headerUrl){
         int rows = userMapper.updateHeader(userId,headerUrl);
-        initCache(userId);
+        clearCache(userId);
         return rows;
     }
 
@@ -210,5 +208,25 @@ public class UserService implements CommunityConstant {
     private void clearCache(int userId) {
         String redisKey = RedisKeyUtil.getUserKey(userId);
         redisTemplate.delete(redisKey);
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities(int userId) {
+        User user = this.findUserById(userId);
+
+        List<GrantedAuthority> list = new ArrayList<>();
+        list.add(new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                switch (user.getType()) {
+                    case 1:
+                        return AUTHORITY_ADMIN;
+                    case 2:
+                        return AUTHORITY_MODERATOR;
+                    default:
+                        return AUTHORITY_USER;
+                }
+            }
+        });
+        return list;
     }
 }
